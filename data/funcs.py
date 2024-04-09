@@ -1,9 +1,10 @@
 from typing import Any
 import psycopg2
 import requests
+from requests import Response
 
 
-def get_hh_data(url, params) -> list[dict[str, Any]]:
+def get_hh_data(url) -> list[dict[str, Any]]:
     """Получение данных о компаниях-работодателях с помощью API hh.ru"""
 
     headers = {'User-Agent': 'HH-User-Agent'}
@@ -17,6 +18,24 @@ def get_hh_data(url, params) -> list[dict[str, Any]]:
         clear_data = data['items']
         new_list.extend(clear_data)
         params['page'] += 1
+
+    return new_list
+
+
+def get_vac_data(url, companies) -> list[dict[str, Any]]:
+    """Получение данных о компаниях-работодателях с помощью API hh.ru"""
+
+    headers = {'User-Agent': 'HH-User-Agent'}
+
+    new_list = []
+    for company in companies:
+        params = {'page': 0, 'per_page': 100, 'search_field': 'name', 'employer''id': f'{company}'}
+        while params.get('page') != 50:
+            response = requests.get(url, headers=headers, params=params)
+            data = response.json()
+            clear_data = data['items']
+            new_list.extend(clear_data)
+            params['page'] += 1
 
     return new_list
 
@@ -51,7 +70,8 @@ def create_database(database_name: str, params: dict):
                 vacancy_id INTEGER PRIMARY KEY,
                 title VARCHAR(255) NOT NULL,
                 company_id INTEGER NOT NULL,
-                salary VARCHAR(100),
+                salary_from VARCHAR(100),
+                salary_to VARCHAR(100),
                 url VARCHAR(100)
             )
         """)
@@ -59,33 +79,33 @@ def create_database(database_name: str, params: dict):
     conn.commit()
     conn.close()
 
-    def save_data_to_database(vacancies: list[dict[str, Any]], companies: list[dict[str, Any]], database_name: str,
-                              params: dict):
-        """Сохранение данных о вакансиях и компаниях в базу данных."""
 
-        conn = psycopg2.connect(dbname=database_name, **params)
+def save_data_to_database(vacancies: list[dict[str, Any]], companies: list[dict[str, Any]], database_name: str,
+                          params: dict):
+    """Сохранение данных о вакансиях и компаниях в базу данных."""
 
-        with conn.cursor() as cur:
-            for vacancy in vacancies:
-                cur.execute(
-                    """
-                    INSERT INTO vacancies (vacancy_id, title, company_id, salary, url)
-                    VALUES (%s, %s, %s, %s, %s)
-                    """,
-                    (vacancy['id'], vacancy['name'], vacancy['employer']['id'],
-                     f"от {vacancy['salary']['from']} до {vacancy['salary']['to']}",
-                     vacancy['alternate_url'])
-                )
+    conn = psycopg2.connect(dbname=database_name, **params)
 
-            for company in companies:
-                cur.execute(
-                    """
-                    INSERT INTO companies (company_id, title, vacancies, url)
-                    VALUES (%s, %s, %s, %s)
-                    """,
-                    (company['id'], company['name'], company['open_vacancies'],
-                     company['alternate_url'])
-                )
+    with conn.cursor() as cur:
+        for vacancy in vacancies:
+            cur.execute(
+                """
+                INSERT INTO vacancies (vacancy_id, title, company_id, salary_from, salary_to, url)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (vacancy['id'], vacancy['name'], vacancy['employer']['id'], vacancy['salary']['from'],
+                 vacancy['salary']['to'], vacancy['alternate_url'])
+            )
 
-        conn.commit()
-        conn.close()
+        for company in companies:
+            cur.execute(
+                """
+                INSERT INTO companies (company_id, title, vacancies, url)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (company['id'], company['name'], company['open_vacancies'],
+                 company['alternate_url'])
+            )
+
+    conn.commit()
+    conn.close()

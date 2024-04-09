@@ -7,13 +7,15 @@ POSTGRESKEY
 
 
 def main():
-    channel_ids = [
+
+    companies_ids = [
         'UC-OVMPlMA3-YCIeg4z5z23A',  # moscowpython
         'UCwHL6WHUarjGfUM_586me8w',  # highload
 
     ]
-    data_vacancies = get_hh_data('http://api.hh.ru/vacancies')
+
     data_companies = get_hh_data('https://api.hh.ru/employers')
+    data_vacancies = get_hh_data('http://api.hh.ru/vacancies', companies_ids)
     create_database()
 
 
