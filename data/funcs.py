@@ -47,7 +47,7 @@ def create_database(database_name: str, params: dict):
     conn.autocommit = True
     cur = conn.cursor()
 
-    cur.execute(f"DROP DATABASE {database_name}")
+    # cur.execute(f"DROP DATABASE {database_name}")
     cur.execute(f"CREATE DATABASE {database_name}")
 
     conn.close()
@@ -88,13 +88,21 @@ def save_data_to_database(vacancies: list[dict[str, Any]], companies: list[dict[
 
     with conn.cursor() as cur:
         for vacancy in vacancies:
+            if vacancy['salary']['from']:
+                salary_from = vacancy['salary']['from']
+            else:
+                salary_from = 0
+            if vacancy['salary']['to']:
+                salary_to = vacancy['salary']['to']
+            else:
+                salary_to = 0
             cur.execute(
                 """
                 INSERT INTO vacancies (vacancy_id, title, company_id, salary_from, salary_to, url)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 """,
-                (vacancy['id'], vacancy['name'], vacancy['employer']['id'], vacancy['salary']['from'],
-                 vacancy['salary']['to'], vacancy['alternate_url'])
+                (vacancy['id'], vacancy['name'], vacancy['employer']['id'], salary_from,
+                 salary_to, vacancy['alternate_url'])
             )
 
         for company in companies:
