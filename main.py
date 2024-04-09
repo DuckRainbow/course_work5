@@ -20,10 +20,12 @@ def main():
     ]
     params = config()
 
-    data_companies = get_hh_data('https://api.hh.ru/employers')
-    data_vacancies = get_vac_data('http://api.hh.ru/vacancies', companies_ids)
+    new_list_com = []
+    new_list_vac = []
+
+    get_vac_data('http://api.hh.ru/vacancies', companies_ids)
     create_database('hhru', params)
-    save_data_to_database(data_vacancies, data_companies, 'hhru', params)
+    save_data_to_database(new_list_vac, new_list_com, 'hhru', params)
 
     dbmanager = DBManager('hhru')
     print('Выберите опцию:')

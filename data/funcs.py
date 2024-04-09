@@ -4,40 +4,20 @@ import requests
 from requests import Response
 
 
-def get_hh_data(url) -> list[dict[str, Any]]:
-    """Получение данных о компаниях-работодателях с помощью API hh.ru"""
+def get_vac_data(url, companies, new_list_com, new_list_vac) -> list[dict[str, Any]]:
+    """Получение данных о компаниях-работодателях и вакансиях с помощью API hh.ru"""
 
-    headers = {'User-Agent': 'HH-User-Agent'}
-    params = {'page': 0, 'per_page': 100, 'search_field': 'name'}
+    # headers = {'User-Agent': 'HH-User-Agent'}
 
-    new_list = []
-
-    while params.get('page') != 50:
-        response = requests.get(url, headers=headers, params=params)
-        data = response.json()
-        clear_data = data['items']
-        new_list.extend(clear_data)
-        params['page'] += 1
-
-    return new_list
-
-
-def get_vac_data(url, companies) -> list[dict[str, Any]]:
-    """Получение данных о компаниях-работодателях с помощью API hh.ru"""
-
-    headers = {'User-Agent': 'HH-User-Agent'}
-
-    new_list = []
     for company in companies:
-        params = {'page': 0, 'per_page': 100, 'search_field': 'name', 'employer''id': f'{company}'}
-        while params.get('page') != 50:
-            response = requests.get(url, headers=headers, params=params)
+
+        params = {'per_page': 100, 'employer_id': company}
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
             data = response.json()
             clear_data = data['items']
-            new_list.extend(clear_data)
-            params['page'] += 1
-
-    return new_list
+            new_list_com.append(clear_data[0]['employer'])
+            new_list_vac.extend(clear_data)
 
 
 def create_database(database_name: str, params: dict):
@@ -69,7 +49,7 @@ def create_database(database_name: str, params: dict):
             CREATE TABLE vacancies (
                 vacancy_id INTEGER PRIMARY KEY,
                 title VARCHAR(255) NOT NULL,
-                company_id INTEGER NOT NULL,
+                company_id FOREIGN KEY (company_id) REFERENCES companies
                 salary_from VARCHAR(100),
                 salary_to VARCHAR(100),
                 url VARCHAR(100)
