@@ -28,7 +28,7 @@ def main():
     conn = psycopg2.connect(dbname='hhru', params)
     conn.autocommit = True
     with conn.cursor() as cur:
-        dbmanager = DBManager('hhru')
+        dbmanager = DBManager()
         print('Выберите опцию:')
         print('1. Вывести список всех компаний и количество вакансий у них.')
         print('2. Вывести список всех вакансий с указанием названия компании.')
