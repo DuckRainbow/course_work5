@@ -37,7 +37,6 @@ def create_database(database_name: str, params: dict):
             CREATE TABLE companies (
                 company_id INTEGER PRIMARY KEY,
                 title VARCHAR(255) NOT NULL,
-                vacancies INTEGER,
                 url VARCHAR(100) NOT NULL
             )
         """)
@@ -47,7 +46,7 @@ def create_database(database_name: str, params: dict):
             CREATE TABLE vacancies (
                 vacancy_id INTEGER PRIMARY KEY,
                 title VARCHAR(255) NOT NULL,
-                company_id FOREIGN KEY (company_id) REFERENCES companies
+                company_id INTEGER REFERENCES companies(company_id),
                 salary_from VARCHAR(100),
                 salary_to VARCHAR(100),
                 url VARCHAR(100)
@@ -95,8 +94,6 @@ def save_data_to_database(vacancies: list[dict[str, Any]], companies: list[dict[
                 (vacancy['id'], vacancy['name'], vacancy['employer']['id'], salary_from,
                  salary_to, vacancy['alternate_url'])
             )
-
-        
 
     conn.commit()
     conn.close()

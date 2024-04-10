@@ -1,8 +1,10 @@
 import os
 
+import psycopg2
+
 from config import config
 from data.classes import DBManager
-from data.funcs import get_hh_data, create_database, get_vac_data, save_data_to_database
+from data.funcs import create_database, get_vac_data, save_data_to_database
 
 
 def main():
@@ -22,13 +24,13 @@ def main():
     new_list_com = []
     new_list_vac = []
 
-    get_vac_data('http://api.hh.ru/vacancies', companies_ids)
-    create_database('hhru')
-    save_data_to_database(new_list_vac, new_list_com, 'hhru')
-    conn = psycopg2.connect(dbname='hhru', params)
+    get_vac_data('http://api.hh.ru/vacancies', companies_ids, new_list_com, new_list_vac)
+    create_database('hhru', params)
+    save_data_to_database(new_list_vac, new_list_com, 'hhru', params)
+    conn = psycopg2.connect(dbname='hhru', **params)
     conn.autocommit = True
     with conn.cursor() as cur:
-        dbmanager = DBManager()
+        dbmanager = DBManager(cur)
         print('Выберите опцию:')
         print('1. Вывести список всех компаний и количество вакансий у них.')
         print('2. Вывести список всех вакансий с указанием названия компании.')
