@@ -7,8 +7,6 @@ from requests import Response
 def get_vac_data(url, companies, new_list_com, new_list_vac) -> list[dict[str, Any]]:
     """Получение данных о компаниях-работодателях и вакансиях с помощью API hh.ru"""
 
-    # headers = {'User-Agent': 'HH-User-Agent'}
-
     for company in companies:
 
         params = {'per_page': 100, 'employer_id': company}
@@ -27,7 +25,7 @@ def create_database(database_name: str, params: dict):
     conn.autocommit = True
     cur = conn.cursor()
 
-    # cur.execute(f"DROP DATABASE {database_name}")
+    cur.execute(f"DROP DATABASE {database_name}")
     cur.execute(f"CREATE DATABASE {database_name}")
 
     conn.close()
