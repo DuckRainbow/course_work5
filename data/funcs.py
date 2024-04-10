@@ -65,14 +65,27 @@ def save_data_to_database(vacancies: list[dict[str, Any]], companies: list[dict[
     conn = psycopg2.connect(dbname=database_name, **params)
 
     with conn.cursor() as cur:
+        for company in companies:
+            cur.execute(
+                """
+                INSERT INTO companies (company_id, title, url)
+                VALUES (%s, %s, %s)
+                """,
+                (company['id'], company['name'],
+                 company['alternate_url'])
+            )
         for vacancy in vacancies:
-            if vacancy['salary']['from']:
-                salary_from = vacancy['salary']['from']
+            if vacancy['salary']:
+                if vacancy['salary']['from']:
+                    salary_from = vacancy['salary']['from']
+                else:
+                    salary_from = 0
+                if vacancy['salary']['to']:
+                    salary_to = vacancy['salary']['to']
+                else:
+                    salary_to = 0
             else:
                 salary_from = 0
-            if vacancy['salary']['to']:
-                salary_to = vacancy['salary']['to']
-            else:
                 salary_to = 0
             cur.execute(
                 """
@@ -83,15 +96,7 @@ def save_data_to_database(vacancies: list[dict[str, Any]], companies: list[dict[
                  salary_to, vacancy['alternate_url'])
             )
 
-        for company in companies:
-            cur.execute(
-                """
-                INSERT INTO companies (company_id, title, vacancies, url)
-                VALUES (%s, %s, %s, %s)
-                """,
-                (company['id'], company['name'], company['open_vacancies'],
-                 company['alternate_url'])
-            )
+        
 
     conn.commit()
     conn.close()
