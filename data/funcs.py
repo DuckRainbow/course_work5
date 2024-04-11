@@ -47,8 +47,8 @@ def create_database(database_name: str, params: dict):
                 vacancy_id INTEGER PRIMARY KEY,
                 title VARCHAR(255) NOT NULL,
                 company_id INTEGER REFERENCES companies(company_id),
-                salary_from VARCHAR(100),
-                salary_to VARCHAR(100),
+                salary_from INT,
+                salary_to INT,
                 url VARCHAR(100)
             )
         """)
