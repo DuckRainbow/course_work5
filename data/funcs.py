@@ -1,10 +1,10 @@
 from typing import Any
+
 import psycopg2
 import requests
-from requests import Response
 
 
-def get_vac_data(url, companies, new_list_com, new_list_vac) -> list[dict[str, Any]]:
+def get_vac_data(url, companies, new_list_com, new_list_vac):
     """Получение данных о компаниях-работодателях и вакансиях с помощью API hh.ru"""
 
     for company in companies:
