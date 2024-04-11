@@ -50,6 +50,7 @@ def main():
                 data = dbmanager.get_avg_salary()
                 print(data)
             elif int(user_answer) == 4:
+                avg_salary = dbmanager.get_avg_salary()
                 data = dbmanager.get_vacancies_with_higher_salary()
                 print(data)
             elif int(user_answer) == 5:

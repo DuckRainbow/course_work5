@@ -10,7 +10,8 @@ def get_vac_data(url, companies, new_list_com, new_list_vac) -> list[dict[str, A
     for company in companies:
 
         params = {'per_page': 100, 'employer_id': company}
-        response = requests.get(url, params=params)
+        headers = {'User-Agent': 'HH-User-Agent'}
+        response = requests.get(url, params=params, headers=headers)
         if response.status_code == 200:
             data = response.json()
             clear_data = data['items']

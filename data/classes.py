@@ -29,18 +29,18 @@ class DBManager:
     def get_avg_salary(self):
         """получает среднюю зарплату по вакансиям."""
         self.cur.execute("SELECT AVG(salary_to) FROM vacancies")
-        self.avg_salary = self.cur.fetchall()
+        self.avg_salary = self.cur.fetchone()[0]
         return self.avg_salary
 
     def get_vacancies_with_higher_salary(self):
         """получает список всех вакансий, у которых зарплата выше средней по всем вакансиям."""
         self.cur.execute(
             f"SELECT vacancy_id, title, salary_from, salary_to FROM vacancies WHERE salary_from > {self.avg_salary} OR salary_to > {self.avg_salary}")
-        self.vac_salary = self.cur.fetchoneall()
+        self.vac_salary = self.cur.fetchall()
         return self.vac_salary
 
-    def get_vacancies_with_keyword(self, params, word):
+    def get_vacancies_with_keyword(self, word):
         """получает список всех вакансий, в названии которых содержатся переданные в метод слова, например python."""
-        self.cur.execute(f"SELECT title, salary, url FROM vacancies WHERE title LIKE '%{word}%'")
+        self.cur.execute(f"SELECT title, salary_from, salary_to, url FROM vacancies WHERE title LIKE '%{word}%'")
         self.data_vac = self.cur.fetchall()
         return self.data_vac
