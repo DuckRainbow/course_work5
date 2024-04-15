@@ -40,21 +40,26 @@ def main():
             user_answer = input()
             if int(user_answer) == 1:
                 data = dbmanager.get_companies_and_vacancies_count()
-                print(data)
+                for data_ in data:
+                    print(f'Компания: {data_[1]}, кол-во вакансий: {data_[2]}')
             elif int(user_answer) == 2:
                 data = dbmanager.get_all_vacancies()
-                print(data)
+                for data_ in data:
+                    print(f'Компания: {data_[0]}, вакансия: {data_[1]}, зар.плата от {data_[2]} до {data_[3]}, ссылка '
+                          f'на вакансию: {data_[4]}')
             elif int(user_answer) == 3:
                 data = dbmanager.get_avg_salary()
-                print(data)
+                print(round(data, 2))
             elif int(user_answer) == 4:
                 avg_salary = dbmanager.get_avg_salary()
                 data = dbmanager.get_vacancies_with_higher_salary()
-                print(data)
+                for data_ in data:
+                    print(f'Вакансия: {data_[1]}, зар.плата от {data_[2]} до {data_[3]}')
             elif int(user_answer) == 5:
                 user_word = input('Введите слово, по которому будем искать вакансии: ')
                 data = dbmanager.get_vacancies_with_keyword(user_word)
-                print(data)
+                for data_ in data:
+                    print(f'Вакансия: {data_[0]},  зар.плата от {data_[1]} до {data_[2]}, ссылка на вакансию: {data_[3]}')
             else:
                 break
         conn.commit()
